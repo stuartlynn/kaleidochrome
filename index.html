@@ -3,6 +3,7 @@
   <script type="text/javascript" src='lib/leaflet-0.7.3/leaflet.js'></script>
   <script type="text/javascript" src='lib/leaflet-hash.js'></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href='lib/leaflet-0.7.3/leaflet.css' rel='stylesheet' />
   <style>
     body{
@@ -50,8 +51,21 @@
     .social{
       position: absolute;
       z-index: 10;
-      top: 40px;
+      top: 80px;
       right: 20px;
+    }
+
+    .wonder{
+      position :absolute;
+      z-index: 10;
+      top: 50px;
+      right: 20px;
+    }
+
+    .social .fa{
+      font-size:30px;
+      color: white;
+      margin-right: 10px;
     }
 
   </style>
@@ -69,10 +83,10 @@
       "microwave" : "http://s3.amazonaws.com/chromoscope-Planck-FSM-tiles/#{tilename}.jpg",
       "radio"     : "http://s3.amazonaws.com/chromoscope-Radio_vsmoothed-tiles//#{tilename}.jpg"
     }
-    map1 = L.map('sky1',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false}).setView([0,180],2);
-    map2 = L.map('sky2',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
-    map3 = L.map('sky3',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
-    map4 = L.map('sky4',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
+    map1 = L.map('sky1',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false}).setView([0,180],4);
+    map2 = L.map('sky2',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],4);
+    map3 = L.map('sky3',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],4);
+    map4 = L.map('sky4',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],4);
 
     window.hash = new L.Hash(map1)
 
@@ -206,6 +220,25 @@
 
     }
 
+
+    randomMove = function(){
+
+      x = 4*Math.cos(window.angle)
+      y = 4*Math.sin(window.angle)
+      map1.panBy([x,y], {duration:100, animate:false})
+    }
+
+    $("#wonder").toggle(function(){
+      // randomMove()
+      window.angle = Math.random()*180
+      window.moveInterval = setInterval(randomMove,100)
+      $(this).html("Stop Wondering")
+    },
+    function(){
+      clearInterval(window.moveInterval)
+      $(this).html("Start Wondering")
+    });
+
     $("#layer_selector").append(layer_select)
 
     layer_select.change(function(e){
@@ -219,10 +252,14 @@
 </head>
     <body>
 
+      <div class='wonder'>
+        <button id="wonder">Start Wondering</button>
+      </div>
+
       <div class='social'>
         <a id='twitter' href="http://twitter.com/share?text=Kaleidochrome what will you see?&url="+document.URL>
-          Share This on Twitter</a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://shouldbedoingsomethingelse.com/kaleidochrome/">Share on Facebook</a>
+          <i class='fa fa-twitter-square'></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://shouldbedoingsomethingelse.com/kaleidochrome/"><i class="fa fa-facebook-square"></i></a>
 
       </div>
 
