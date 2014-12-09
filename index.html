@@ -68,6 +68,16 @@
       margin-right: 10px;
     }
 
+    h1{
+      position: absolute;
+      bottom:20px;
+      left:20px;
+      color:white;
+      z-index: 10;
+      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+      font-weight: 300;
+    }
+
   </style>
 
   <script type='text/javascript'>
@@ -222,7 +232,7 @@
 
 
     changeDirection = function(){
-      window.angle = Math.random()*180
+      window.angle = Math.random()*Math.PI
     }
 
     randomMove = function(){
@@ -233,9 +243,9 @@
     }
 
     $("#wonder").toggle(function(){
-      window.angle = Math.random()*180
+      window.angle = Math.random()*Math.PI
       window.moveInterval = setInterval(randomMove,100)
-      window.directionChangeInterval = setInterval(changeDirection, 10000)
+      window.directionChangeInterval = setInterval(changeDirection, 4000)
       $(this).html("Stop Wondering")
     },
     function(){
@@ -275,5 +285,7 @@
       <div class='sky' id='sky2'></div>
       <div class='sky' id='sky3'></div>
       <div class='sky' id='sky4'></div>
+
+      <h1>Kaleidochrome</h1>
     </body>
     </html>
