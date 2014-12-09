@@ -47,6 +47,12 @@
       top: 20px;
       right: 20px;
     }
+    .social{
+      position: absolute;
+      z-index: 10;
+      top: 40px;
+      right: 20px;
+    }
 
   </style>
 
@@ -54,26 +60,25 @@
     $(document).ready(function(){
 
     window.datasets = {
-      "x-ray"     : "http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg",
-      "gamma-ray" : "http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg",
-      "h-alpha"   : "https://s3.amazonaws.com/Chromoscope/H-alpha-tiles/#{tilename}.jpg",
+      "gamma-ray" : "http://astrog80.astro.cf.ac.uk/Chromoscope/fermi-tiles/#{tilename}.jpg",
+      "x-ray"     : "http://s3.amazonaws.com/chromoscope-DSS2-tiles/#{tilename}.jpg",
       "visible"   : "http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg",
-      "near-ir"   : "https://s3.amazonaws.com/Chromoscope/WISE-tiles/#{tilename}.jpg",
-      "far-ir"    : "https://s3.amazonaws.com/Chromoscope/WISE-tiles/#{tilename}.jpg",
-      "microwave" : "https://s3.amazonaws.com/Chromoscope/WISE-tiles/#{tilename}.jpg",
-      "radio"     : "https://s3.amazonaws.com/Chromoscope/WISE-tiles/#{tilename}.jpg"
+      "h-alpha"   : "http://s3.amazonaws.com/chromoscope-H-alpha-tiles/#{tilename}.jpg",
+      "near-ir"   : "http://s3.amazonaws.com/chromoscope-WISE-tiles/#{tilename}.jpg",
+      "far-ir"    : "http://s3.amazonaws.com/chromoscope-IRAS-tiles/#{tilename}.jpg",
+      "microwave" : "http://s3.amazonaws.com/chromoscope-Planck-FSM-tiles/#{tilename}.jpg",
+      "radio"     : "http://s3.amazonaws.com/chromoscope-Radio_vsmoothed-tiles//#{tilename}.jpg"
     }
     map1 = L.map('sky1',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false}).setView([0,180],2);
     map2 = L.map('sky2',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
     map3 = L.map('sky3',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
     map4 = L.map('sky4',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
 
-    var hash = new L.Hash(map1)
+    window.hash = new L.Hash(map1)
 
     window.current_layers = []
 
     layer_url =  function(tilePoint){
-      console.log(this)
       window.lay = this
       zoom = this._getZoomForUrl();
       convertTileUrl = function(x,y,s,zoom) {
@@ -107,6 +112,7 @@
 
     changeLayer = function(layer){
 
+      window.wavelength=layer
 
       if(current_layers.length > 0){
         map1.removeLayer(current_layers[0])
@@ -123,7 +129,14 @@
       current_layers[3].addTo(map4)
     }
 
-    changeLayer("h-alpha")
+    if(window.datasets[window.wavelength]){
+      changeLayer(window.wavelength)
+    }
+    else{
+      window.wavelength="visible"
+      changeLayer(window.wavelength)
+    }
+
 
     onMove= function(){
       lat_long
@@ -132,7 +145,6 @@
 
     map1.on("zoomstart", function(e){
       zoom  = e.target._zoom;
-      console.log("here "+zoom)
       map2.setZoom(zoom)
       map3.setZoom(zoom)
       map4.setZoom(zoom)
@@ -182,17 +194,23 @@
 
     update_sizes();
 
-
     var layer_select = $('<select />');
 
     for(var val in window.datasets  ){
-      $('<option />', {value: val, text:val}).appendTo(layer_select);
+      if(val==window.wavelength){
+        $('<option  />', {value: val, text:val,selected: true}).appendTo(layer_select);
+      }
+      else{
+        $('<option  />', {value: val, text:val}).appendTo(layer_select);
+      }
+
     }
 
     $("#layer_selector").append(layer_select)
 
     layer_select.change(function(e){
       changeLayer(this.value)
+      window.hash.onMapMove()
     })
 
 
@@ -202,6 +220,8 @@
     <body>
 
       <div class='social'>
+        <a href="http://twitter.com/share?text=kaleidochrome what will you see url="+document.URL>
+          Share This on Twitter</a>
       </div>
 
       <div id="layer_selector">
