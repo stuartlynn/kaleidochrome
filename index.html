@@ -1,0 +1,186 @@
+<html>
+<head>
+<script type="text/javascript" src='lib/leaflet-0.7.3/leaflet.js'></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<link href='lib/leaflet-0.7.3/leaflet.css' rel='stylesheet' />
+<style>
+body{
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  padding:0px;
+  margin: 0px;
+}
+.sky{
+  width: 50%,
+  height: 50%
+  padding:0px;
+  margin: 0px;
+  position:absolute;
+}
+#sky1{
+  left:0%;
+  top: 0%;
+}
+
+#sky2{
+  left: 50%;
+  top:  0%;
+  transform: scale3d(-1, 1, 1);
+}
+#sky3{
+  left: 50%;
+  top:  50%;
+  transform: scale3d(-1, -1, 1);
+
+}
+#sky4{
+  left: 0%;
+  top: 50%;
+  transform: scale3d(1, -1, 1);
+}
+
+</style>
+<script type='text/javascript'>
+$(document).ready(function(){
+
+  window.datasets = [
+    ["x-ray"     , "http://s3.amazonaws.com/chromoscope-photopic/code.jpg"],
+    ["gamma-ray" , "http://s3.amazonaws.com/chromoscope-photopic/code.jpg"],
+    ["h-alpha"   , "https://s3.amazonaws.com/Chromoscope/H-alpha-tiles/code.jpg"],
+    ["visible"   , "http://s3.amazonaws.com/chromoscope-photopic/code.jpg"],
+    ["near-ir"   , "https://s3.amazonaws.com/Chromoscope/WISE-tiles/code.jpg"],
+    ["far-ir"    , "https://s3.amazonaws.com/Chromoscope/WISE-tiles/code.jpg"],
+    ["microwave" , "https://s3.amazonaws.com/Chromoscope/WISE-tiles/code.jpg"],
+    ["radio"     , "https://s3.amazonaws.com/Chromoscope/WISE-tiles/code.jpg"]
+  ]
+  map1 = L.map('sky1',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false}).setView([0,180],2);
+  map2 = L.map('sky2',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
+  map3 = L.map('sky3',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
+  map4 = L.map('sky4',{attributionControl: false, zoomAnimation: false, fadeAnimation: false, inertia: false, zoomControl: false }).setView([0,180],2);
+
+  onMove= function(){
+    lat_long
+  }
+
+
+  layer1 = L.tileLayer('http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg',
+  {
+    maxZoom: 18
+  });
+
+  layer2 = L.tileLayer('http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg',
+  {
+    maxZoom: 18
+  });
+
+  layer3 = L.tileLayer('http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg',
+  {
+    maxZoom: 18
+  });
+
+  layer4 = L.tileLayer('http://s3.amazonaws.com/chromoscope-photopic/#{tilename}.jpg',
+  {
+    maxZoom: 18
+  });
+
+  map1.on("zoomstart", function(e){
+    zoom  = e.target._zoom;
+    console.log("here "+zoom)
+    map2.setZoom(zoom)
+    map3.setZoom(zoom)
+    map4.setZoom(zoom)
+  });
+
+  map1.on('move', function(e){
+    map2.setView(map1.getCenter(), map1.getZoom(),{animate:false})
+    map3.setView(map1.getCenter(), map1.getZoom(),{animate:false})
+    map4.setView(map1.getCenter(), map1.getZoom(),{animate:false})
+  })
+
+
+  map2.on('move', function(e){
+    map1.setView(map2.getCenter(), map2.getZoom(),{animate:false})
+    map3.setView(map2.getCenter(), map2.getZoom(),{animate:false})
+    map4.setView(map2.getCenter(), map2.getZoom(),{animate:false})
+  })
+
+  map3.on('move', function(e){
+    map2.setView(map3.getCenter(), map3.getZoom(),{animate:false})
+    map1.setView(map3.getCenter(), map3.getZoom(),{animate:false})
+    map4.setView(map3.getCenter(), map3.getZoom(),{animate:false})
+  })
+
+
+  map4.on('move', function(e){
+    map2.setView(map4.getCenter(), map4.getZoom(),{animate:false})
+    map3.setView(map4.getCenter(), map4.getZoom(),{animate:false})
+    map1.setView(map4.getCenter(), map4.getZoom(),{animate:false})
+  })
+
+
+
+  update_sizes = function(){
+    width  = $(window).width()
+    height = $(window).height()
+
+    $(".sky").width(width/2.0)
+    $(".sky").height(height/2.0)
+    map1.invalidateSize()
+    map2.invalidateSize()
+    map3.invalidateSize()
+    map4.invalidateSize()
+  }
+
+  $(window).resize(update_sizes)
+
+  update_sizes();
+
+
+
+
+  layer_url =  function(tilePoint){
+
+    zoom = this._getZoomForUrl();
+    convertTileUrl = function(x,y,s,zoom) {
+      var pixels = Math.pow(2, zoom);
+      var d=(x+pixels)%(pixels);
+      var e=(y+pixels)%(pixels);
+      var f="t";
+      for(var g=0 ; g < zoom ; g++){
+        pixels=pixels/2;
+        if(e<pixels){
+          if(d<pixels){f+="q"}
+            else{f+="r";d-=pixels}
+            }else{
+              if(d<pixels){f+="t";e-=pixels}
+                else{f+="s";d-=pixels;e-=pixels}
+                }
+              }
+              return {x:x,y:y,src:f,s:s}
+            }
+            url =  convertTileUrl(tilePoint.x, tilePoint.y,1, zoom);
+
+            return "http://s3.amazonaws.com/chromoscope-photopic/"+url.src+".jpg"
+          }
+
+
+    layer1.getTileUrl = layer_url
+    layer2.getTileUrl = layer_url
+    layer3.getTileUrl = layer_url
+    layer4.getTileUrl = layer_url
+
+    layer1.addTo(map1);
+    layer2.addTo(map2);
+    layer3.addTo(map3);
+    layer4.addTo(map4);
+});
+      </script>
+    </head>
+    <body>
+      <div class='sky' id='sky1'></div>
+      <div class='sky' id='sky2'></div>
+      <div class='sky' id='sky3'></div>
+      <div class='sky' id='sky4'></div>
+    </body>
+    </html>
