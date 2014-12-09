@@ -221,6 +221,10 @@
     }
 
 
+    changeDirection = function(){
+      window.angle = Math.random()*180
+    }
+
     randomMove = function(){
 
       x = 4*Math.cos(window.angle)
@@ -229,13 +233,14 @@
     }
 
     $("#wonder").toggle(function(){
-      // randomMove()
       window.angle = Math.random()*180
       window.moveInterval = setInterval(randomMove,100)
+      window.directionChangeInterval = setInterval(changeDirection, 10000)
       $(this).html("Stop Wondering")
     },
     function(){
       clearInterval(window.moveInterval)
+      clearInterval(window.directionChangeInterval)
       $(this).html("Start Wondering")
     });
 
